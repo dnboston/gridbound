@@ -1,11 +1,17 @@
 import pygame
 
 
+WINDOW_WIDTH = 800
+WINDOW_HEIGHT = 600
+FPS = 60
+BACKGROUND_COLOR = (0, 0, 0)
+
+
 class Game:
     def __init__(self) -> None:
         pygame.init()
 
-        self.screen = pygame.display.set_mode((800, 600))
+        self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         pygame.display.set_caption("Gridbound")
 
         self.clock = pygame.time.Clock()
@@ -16,7 +22,7 @@ class Game:
             self.handle_events()
             self.update()
             self.render()
-            self.clock.tick(60)
+            self.clock.tick(FPS)
 
         pygame.quit()
 
@@ -29,7 +35,7 @@ class Game:
         pass
 
     def render(self) -> None:
-        self.screen.fill((0, 0, 0))
+        self.screen.fill(BACKGROUND_COLOR)
         pygame.display.flip()
 
 
