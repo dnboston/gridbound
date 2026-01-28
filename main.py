@@ -8,6 +8,10 @@ from config import (
 )
 
 
+PLAYER_COLOR = (200, 200, 200)
+PLAYER_SIZE = 20
+
+
 class Game:
     def __init__(self) -> None:
         pygame.init()
@@ -19,6 +23,8 @@ class Game:
         self.running = True
 
         self.keys = pygame.key.get_pressed()
+
+        self.player_pos = pygame.Vector2(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2)
 
     def run(self) -> None:
         while self.running:
@@ -41,6 +47,14 @@ class Game:
 
     def render(self) -> None:
         self.screen.fill(BACKGROUND_COLOR)
+
+        pygame.draw.rect(self.screen, PLAYER_COLOR, pygame.Rect(self.player_pos.x - PLAYER_SIZE // 2,
+                                                                self.player_pos.y - PLAYER_SIZE // 2,
+                                                                PLAYER_SIZE,
+                                                                PLAYER_SIZE,
+                                                                )
+                        )
+        
         pygame.display.flip()
 
 
