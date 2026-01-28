@@ -18,6 +18,8 @@ class Game:
         self.clock = pygame.time.Clock()
         self.running = True
 
+        self.keys = pygame.key.get_pressed()
+
     def run(self) -> None:
         while self.running:
             self.handle_events()
@@ -31,6 +33,8 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
+
+        self.keys = pygame.key.get_pressed()
 
     def update(self) -> None:
         pass
