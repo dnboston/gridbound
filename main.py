@@ -14,6 +14,10 @@ PLAYER_SIZE = 20
 PLAYER_SPEED = 200
 
 
+def snap_to_grid(value: float, tile_size: int) -> float:
+    return round((value - tile_size / 2) / tile_size) * tile_size + tile_size / 2
+
+
 class Game:
     def __init__(self) -> None:
         pygame.init()
@@ -45,6 +49,8 @@ class Game:
         self.keys = pygame.key.get_pressed()
 
     def update(self, dt: float) -> None:
+        is_moving = False
+
         direction = pygame.Vector2(0, 0)
 
         if self.keys[pygame.K_w]:
@@ -57,12 +63,17 @@ class Game:
             direction.x += 1
 
         if direction.length_squared() > 0:
+            is_moving = True
             direction = direction.normalize()
 
         self.player_pos += direction * PLAYER_SPEED * dt
 
         self.player_pos.x = max(PLAYER_SIZE // 2, min(WINDOW_WIDTH - PLAYER_SIZE // 2, self.player_pos.x))
         self.player_pos.y = max(PLAYER_SIZE // 2, min(WINDOW_HEIGHT - PLAYER_SIZE // 2, self.player_pos.y))
+
+        if not is_moving:
+            self.player_pos.x = snap_to_grid(self.player_pos.x, TILE_SIZE)
+            self.player_pos.y = snap_to_grid(self.player_pos.y, TILE_SIZE)
 
     def render(self) -> None:
         self.screen.fill(BACKGROUND_COLOR)
