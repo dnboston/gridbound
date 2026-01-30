@@ -60,6 +60,9 @@ class Game:
 
         self.player_pos += direction * PLAYER_SPEED * dt
 
+        self.player_pos.x = max(PLAYER_SIZE // 2, min(WINDOW_WIDTH - PLAYER_SIZE // 2, self.player_pos.x))
+        self.player_pos.y = max(PLAYER_SIZE // 2, min(WINDOW_HEIGHT - PLAYER_SIZE // 2, self.player_pos.y))
+
     def render(self) -> None:
         self.screen.fill(BACKGROUND_COLOR)
 
