@@ -46,34 +46,24 @@ class Game:
             if event.type == pygame.QUIT:
                 self.running = False
 
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_w:
+                    self.player_pos.y -= TILE_SIZE
+                elif event.key == pygame.K_s:
+                    self.player_pos.y += TILE_SIZE
+                elif event.key == pygame.K_a:
+                    self.player_pos.x -= TILE_SIZE
+                elif event.key == pygame.K_d:
+                    self.player_pos.x += TILE_SIZE
+
         self.keys = pygame.key.get_pressed()
 
     def update(self, dt: float) -> None:
-        is_moving = False
-
-        direction = pygame.Vector2(0, 0)
-
-        if self.keys[pygame.K_w]:
-            direction.y -= 1
-        if self.keys[pygame.K_s]:
-            direction.y += 1
-        if self.keys[pygame.K_a]:
-            direction.x -= 1
-        if self.keys[pygame.K_d]:
-            direction.x += 1
-
-        if direction.length_squared() > 0:
-            is_moving = True
-            direction = direction.normalize()
-
-        self.player_pos += direction * PLAYER_SPEED * dt
-
         self.player_pos.x = max(PLAYER_SIZE // 2, min(WINDOW_WIDTH - PLAYER_SIZE // 2, self.player_pos.x))
         self.player_pos.y = max(PLAYER_SIZE // 2, min(WINDOW_HEIGHT - PLAYER_SIZE // 2, self.player_pos.y))
 
-        if not is_moving:
-            self.player_pos.x = snap_to_grid(self.player_pos.x, TILE_SIZE)
-            self.player_pos.y = snap_to_grid(self.player_pos.y, TILE_SIZE)
+        self.player_pos.x = snap_to_grid(self.player_pos.x, TILE_SIZE)
+        self.player_pos.y = snap_to_grid(self.player_pos.y, TILE_SIZE)
 
     def render(self) -> None:
         self.screen.fill(BACKGROUND_COLOR)
