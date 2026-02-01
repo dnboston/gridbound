@@ -32,6 +32,9 @@ class Game:
 
         self.player_pos = pygame.Vector2(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2)
 
+        self.player_tile_x = int(self.player_pos.x // TILE_SIZE)
+        self.player_tile_y = int(self.player_pos.y // TILE_SIZE)
+
     def run(self) -> None:
         while self.running:
             self.handle_events()
@@ -48,13 +51,13 @@ class Game:
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_w:
-                    self.player_pos.y -= TILE_SIZE
+                    self.player_tile_y -= 1
                 elif event.key == pygame.K_s:
-                    self.player_pos.y += TILE_SIZE
+                    self.player_tile_y += 1
                 elif event.key == pygame.K_a:
-                    self.player_pos.x -= TILE_SIZE
+                    self.player_tile_x -= 1
                 elif event.key == pygame.K_d:
-                    self.player_pos.x += TILE_SIZE
+                    self.player_tile_x += 1
 
         self.keys = pygame.key.get_pressed()
 
@@ -64,6 +67,9 @@ class Game:
 
         self.player_pos.x = snap_to_grid(self.player_pos.x, TILE_SIZE)
         self.player_pos.y = snap_to_grid(self.player_pos.y, TILE_SIZE)
+
+        self.player_pos.x = self.player_tile_x * TILE_SIZE + TILE_SIZE / 2
+        self.player_pos.y = self.player_tile_y * TILE_SIZE + TILE_SIZE / 2
 
     def render(self) -> None:
         self.screen.fill(BACKGROUND_COLOR)
