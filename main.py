@@ -8,6 +8,9 @@ from config import (
     TILE_SIZE
 )
 
+GRID_WIDTH = WINDOW_WIDTH // TILE_SIZE
+GRID_HEIGHT = WINDOW_HEIGHT // TILE_SIZE
+
 
 PLAYER_COLOR = (200, 200, 200)
 PLAYER_SIZE = 20
@@ -34,6 +37,11 @@ class Game:
 
         self.player_tile_x = int(self.player_pos.x // TILE_SIZE)
         self.player_tile_y = int(self.player_pos.y // TILE_SIZE)
+
+        self.map_data = [[0 for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
+
+        print(len(self.map_data), len(self.map_data[0]))
+
 
     def run(self) -> None:
         while self.running:
