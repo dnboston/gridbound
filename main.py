@@ -40,8 +40,14 @@ class Game:
 
         self.map_data = [[0 for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
 
-        print(len(self.map_data), len(self.map_data[0]))
+        # Create border walls
+        for x in range(GRID_WIDTH):
+            self.map_data[0][x] = 1
+            self.map_data[GRID_HEIGHT - 1][x] = 1
 
+        for y in range(GRID_HEIGHT):
+            self.map_data[y][0] = 1
+            self.map_data[y][GRID_WIDTH - 1] = 1
 
     def run(self) -> None:
         while self.running:
@@ -58,14 +64,22 @@ class Game:
                 self.running = False
 
             if event.type == pygame.KEYDOWN:
+                target_x = self.player_tile_x
+                target_y = self.player_tile_y
+
                 if event.key == pygame.K_w:
-                    self.player_tile_y -= 1
+                    target_y -= 1
                 elif event.key == pygame.K_s:
-                    self.player_tile_y += 1
+                    target_y += 1
                 elif event.key == pygame.K_a:
-                    self.player_tile_x -= 1
+                    target_x -= 1
                 elif event.key == pygame.K_d:
-                    self.player_tile_x += 1
+                    target_x += 1
+
+                # Check map collision
+                if self.map_data[target_y][target_x] == 0:
+                    self.player_tile_x = target_x
+                    self.player_tile_y = target_y
 
         self.keys = pygame.key.get_pressed()
 
