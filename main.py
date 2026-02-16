@@ -16,6 +16,9 @@ PLAYER_COLOR = (200, 200, 200)
 PLAYER_SIZE = 20
 PLAYER_SPEED = 200
 
+FLOOR_COLOR = (40, 40, 40)
+WALL_COLOR = (100, 100, 100)
+
 
 def snap_to_grid(value: float, tile_size: int) -> float:
     return round((value - tile_size / 2) / tile_size) * tile_size + tile_size / 2
@@ -95,6 +98,17 @@ class Game:
 
     def render(self) -> None:
         self.screen.fill(BACKGROUND_COLOR)
+
+        for y in range(GRID_HEIGHT):
+            for x in range(GRID_WIDTH):
+                tile_value = self.map_data[y][x]
+
+                rect = pygame.Rect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+
+                if tile_value == 0:
+                    pygame.draw.rect(self.screen, FLOOR_COLOR, rect)
+                elif tile_value == 1:
+                    pygame.draw.rect(self.screen, WALL_COLOR, rect)
 
         pygame.draw.rect(self.screen, PLAYER_COLOR, pygame.Rect(self.player_pos.x - PLAYER_SIZE // 2,
                                                                 self.player_pos.y - PLAYER_SIZE // 2,
