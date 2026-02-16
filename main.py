@@ -1,4 +1,5 @@
 import pygame
+import random
 
 from config import (
     WINDOW_WIDTH,
@@ -51,6 +52,17 @@ class Game:
         for y in range(GRID_HEIGHT):
             self.map_data[y][0] = 1
             self.map_data[y][GRID_WIDTH - 1] = 1
+
+        # Add random interior walls
+        wall_count = 20
+
+        for _ in range(wall_count):
+            x = random.randint(1, GRID_WIDTH - 2)
+            y = random.randint(1, GRID_HEIGHT - 2)
+
+            # Avoid placing wall on player start
+            if (x, y) != (self.player_tile_x, self.player_tile_y):
+                self.map_data[y][x] = 1
 
     def run(self) -> None:
         while self.running:
