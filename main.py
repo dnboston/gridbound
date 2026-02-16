@@ -64,6 +64,8 @@ class Game:
             if (x, y) != (self.player_tile_x, self.player_tile_y):
                 self.map_data[y][x] = 1
 
+        self.turn_count = 0
+
     def run(self) -> None:
         while self.running:
             self.handle_events()
@@ -95,6 +97,8 @@ class Game:
                 if self.map_data[target_y][target_x] == 0:
                     self.player_tile_x = target_x
                     self.player_tile_y = target_y
+                    self.turn_count += 1
+                    print(f"Turn: {self.turn_count}")
 
         self.keys = pygame.key.get_pressed()
 
