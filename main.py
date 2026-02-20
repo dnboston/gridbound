@@ -108,7 +108,7 @@ class Game:
                     target_x += 1
 
                 # Check map collision
-                if self.map_data[target_y][target_x] == 0:
+                if self.map_data[target_y][target_x] != 1:
                     self.player_tile_x = target_x
                     self.player_tile_y = target_y
                     self.turn_count += 1
