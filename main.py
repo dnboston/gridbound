@@ -29,6 +29,8 @@ class Game:
     def __init__(self) -> None:
         pygame.init()
 
+        self.font = pygame.font.SysFont(None, 24)
+
         self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         pygame.display.set_caption("Gridbound")
 
@@ -98,7 +100,6 @@ class Game:
                     self.player_tile_x = target_x
                     self.player_tile_y = target_y
                     self.turn_count += 1
-                    print(f"Turn: {self.turn_count}")
 
         self.keys = pygame.key.get_pressed()
 
@@ -133,6 +134,10 @@ class Game:
                                                                 )
                         )
         
+        turn_surface = self.font.render(f"Turn: {self.turn_count}", True, (255, 255, 255))
+        
+        self.screen.blit(turn_surface, (10, 10))
+
         for x in range(0, WINDOW_WIDTH, TILE_SIZE):
             pygame.draw.line(self.screen, (40, 40, 40), (x, 0), (x, WINDOW_HEIGHT))
 
