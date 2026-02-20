@@ -20,6 +20,8 @@ PLAYER_SPEED = 200
 FLOOR_COLOR = (40, 40, 40)
 WALL_COLOR = (100, 100, 100)
 
+GOAL_COLOR = (0, 150, 0)
+
 
 def snap_to_grid(value: float, tile_size: int) -> float:
     return round((value - tile_size / 2) / tile_size) * tile_size + tile_size / 2
@@ -68,6 +70,16 @@ class Game:
 
         self.turn_count = 0
 
+        # Place goal tile
+        while True:
+            goal_x = random.randint(1, GRID_WIDTH - 2)
+            goal_y = random.randint(1, GRID_HEIGHT - 2)
+
+            if self.map_data[goal_y][goal_x] == 0 and (goal_x, goal_y) != (self.player_tile_x, self.player_tile_y):
+                self.map_data[goal_y][goal_x] = 2
+                self.goal_pos = (goal_x, goal_y)
+                break
+
     def run(self) -> None:
         while self.running:
             self.handle_events()
@@ -101,6 +113,9 @@ class Game:
                     self.player_tile_y = target_y
                     self.turn_count += 1
 
+                if (self.player_tile_x, self.player_tile_y) == self.goal_pos:
+                    print("You've reached the goal!")
+
         self.keys = pygame.key.get_pressed()
 
     def update(self, dt: float) -> None:
@@ -126,6 +141,8 @@ class Game:
                     pygame.draw.rect(self.screen, FLOOR_COLOR, rect)
                 elif tile_value == 1:
                     pygame.draw.rect(self.screen, WALL_COLOR, rect)
+                elif tile_value == 2:
+                    pygame.draw.rect(self.screen, GOAL_COLOR, rect)
 
         pygame.draw.rect(self.screen, PLAYER_COLOR, pygame.Rect(self.player_pos.x - PLAYER_SIZE // 2,
                                                                 self.player_pos.y - PLAYER_SIZE // 2,
