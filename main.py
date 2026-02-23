@@ -80,6 +80,8 @@ class Game:
                 self.goal_pos = (goal_x, goal_y)
                 break
 
+        self.game_won = False
+
     def run(self) -> None:
         while self.running:
             self.handle_events()
@@ -95,6 +97,9 @@ class Game:
                 self.running = False
 
             if event.type == pygame.KEYDOWN:
+                if self.game_won:
+                    return
+                
                 target_x = self.player_tile_x
                 target_y = self.player_tile_y
 
@@ -114,6 +119,7 @@ class Game:
                     self.turn_count += 1
 
                 if (self.player_tile_x, self.player_tile_y) == self.goal_pos:
+                    self.game_won = True
                     print("You've reached the goal!")
 
         self.keys = pygame.key.get_pressed()
@@ -154,6 +160,12 @@ class Game:
         turn_surface = self.font.render(f"Turn: {self.turn_count}", True, (255, 255, 255))
         
         self.screen.blit(turn_surface, (10, 10))
+
+        if self.game_won:
+            win_surface = self.font.render("YOU WIN", True, (255, 215, 0))
+
+            rect = win_surface.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT //2))
+            self.screen.blit(win_surface, rect)
 
         for x in range(0, WINDOW_WIDTH, TILE_SIZE):
             pygame.draw.line(self.screen, (40, 40, 40), (x, 0), (x, WINDOW_HEIGHT))
