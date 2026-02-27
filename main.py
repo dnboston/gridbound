@@ -22,6 +22,8 @@ WALL_COLOR = (100, 100, 100)
 
 GOAL_COLOR = (0, 150, 0)
 
+ENEMY_COLOR = (200, 50, 50)
+
 
 def snap_to_grid(value: float, tile_size: int) -> float:
     return round((value - tile_size / 2) / tile_size) * tile_size + tile_size / 2
@@ -84,6 +86,7 @@ class Game:
                     self.player_tile_x = target_x
                     self.player_tile_y = target_y
                     self.turn_count += 1
+                    self.move_enemy()
 
                 if (self.player_tile_x, self.player_tile_y) == self.goal_pos:
                     self.game_won = True
@@ -116,6 +119,9 @@ class Game:
                     pygame.draw.rect(self.screen, WALL_COLOR, rect)
                 elif tile_value == 2:
                     pygame.draw.rect(self.screen, GOAL_COLOR, rect)
+
+        enemy_rect = pygame.Rect(self.enemy_tile_x * TILE_SIZE, self.enemy_tile_y * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+        pygame.draw.rect(self.screen, ENEMY_COLOR, enemy_rect)
 
         pygame.draw.rect(self.screen, PLAYER_COLOR, pygame.Rect(self.player_pos.x - PLAYER_SIZE // 2,
                                                                 self.player_pos.y - PLAYER_SIZE // 2,
@@ -183,6 +189,31 @@ class Game:
                 break
 
         self.game_won = False
+
+        # Spawn enemy
+        while True:
+            enemy_x = random.randint(1, GRID_WIDTH - 2)
+            enemy_y = random.randint(1, GRID_HEIGHT - 2)
+
+            if (self.map_data[enemy_y][enemy_x] == 0 and (enemy_x, enemy_y) != (self.player_tile_x, self.player_tile_y) and (enemy_x, enemy_y) != self.goal_pos):
+                self.enemy_tile_x = enemy_x
+                self.enemy_tile_y = enemy_y
+                break
+
+    def move_enemy(self):
+        directions = [(0, -1), (0, 1), (-1, 0), (1, 0)]
+
+        dx, dy = random.choice(directions)
+
+        target_x = self.enemy_tile_x + dx
+        target_y = self.enemy_tile_y + dy
+
+        # Move only if floor tile
+        if self.map_data[target_y][target_x] == 0:
+            # Avoid stepping on goal for now
+            if (target_x, target_y) != self.goal_pos:
+                self.enemy_tile_x = target_x
+                self.enemy_tile_y = target_y
 
 
 def main() -> None:
