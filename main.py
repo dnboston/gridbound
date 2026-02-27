@@ -43,44 +43,7 @@ class Game:
 
         self.player_pos = pygame.Vector2(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2)
 
-        self.player_tile_x = int(self.player_pos.x // TILE_SIZE)
-        self.player_tile_y = int(self.player_pos.y // TILE_SIZE)
-
-        self.map_data = [[0 for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
-
-        # Create border walls
-        for x in range(GRID_WIDTH):
-            self.map_data[0][x] = 1
-            self.map_data[GRID_HEIGHT - 1][x] = 1
-
-        for y in range(GRID_HEIGHT):
-            self.map_data[y][0] = 1
-            self.map_data[y][GRID_WIDTH - 1] = 1
-
-        # Add random interior walls
-        wall_count = 20
-
-        for _ in range(wall_count):
-            x = random.randint(1, GRID_WIDTH - 2)
-            y = random.randint(1, GRID_HEIGHT - 2)
-
-            # Avoid placing wall on player start
-            if (x, y) != (self.player_tile_x, self.player_tile_y):
-                self.map_data[y][x] = 1
-
-        self.turn_count = 0
-
-        # Place goal tile
-        while True:
-            goal_x = random.randint(1, GRID_WIDTH - 2)
-            goal_y = random.randint(1, GRID_HEIGHT - 2)
-
-            if self.map_data[goal_y][goal_x] == 0 and (goal_x, goal_y) != (self.player_tile_x, self.player_tile_y):
-                self.map_data[goal_y][goal_x] = 2
-                self.goal_pos = (goal_x, goal_y)
-                break
-
-        self.game_won = False
+        self.reset_game()
 
     def run(self) -> None:
         while self.running:
@@ -95,8 +58,12 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
-
+            
             if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_r:
+                    self.reset_game()
+                    return
+                
                 if self.game_won:
                     return
                 
@@ -174,6 +141,48 @@ class Game:
             pygame.draw.line(self.screen, (40, 40, 40), (0, y), (WINDOW_WIDTH, y))
 
         pygame.display.flip()
+
+    def reset_game(self):
+        # Reset player position (center of grid)
+        self.player_tile_x = int(self.player_pos.x // TILE_SIZE)
+        self.player_tile_y = int(self.player_pos.y // TILE_SIZE)
+
+        # Create empty map
+        self.map_data = [[0 for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
+
+        # Create border walls
+        for x in range(GRID_WIDTH):
+            self.map_data[0][x] = 1
+            self.map_data[GRID_HEIGHT - 1][x] = 1
+
+        for y in range(GRID_HEIGHT):
+            self.map_data[y][0] = 1
+            self.map_data[y][GRID_WIDTH - 1] = 1
+
+        # Add random interior walls
+        wall_count = 20
+
+        for _ in range(wall_count):
+            x = random.randint(1, GRID_WIDTH - 2)
+            y = random.randint(1, GRID_HEIGHT - 2)
+
+            # Avoid placing wall on player start
+            if (x, y) != (self.player_tile_x, self.player_tile_y):
+                self.map_data[y][x] = 1
+
+        self.turn_count = 0
+
+        # Place goal tile
+        while True:
+            goal_x = random.randint(1, GRID_WIDTH - 2)
+            goal_y = random.randint(1, GRID_HEIGHT - 2)
+
+            if self.map_data[goal_y][goal_x] == 0 and (goal_x, goal_y) != (self.player_tile_x, self.player_tile_y):
+                self.map_data[goal_y][goal_x] = 2
+                self.goal_pos = (goal_x, goal_y)
+                break
+
+        self.game_won = False
 
 
 def main() -> None:
