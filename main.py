@@ -213,19 +213,25 @@ class Game:
                 break
 
     def move_enemy(self):
-        directions = [(0, -1), (0, 1), (-1, 0), (1, 0)]
+        dx = self.player_tile_x - self.enemy_tile_x
+        dy = self.player_tile_y - self.enemy_tile_y
 
-        dx, dy = random.choice(directions)
+        step_x = 0
+        step_y = 0
 
-        target_x = self.enemy_tile_x + dx
-        target_y = self.enemy_tile_y + dy
+        # Choose dominant direction
+        if abs(dx) > abs(dy):
+            step_x = 1 if dx > 0 else -1
+        else:
+            step_y = 1 if dy > 0 else -1
 
-        # Move only if floor tile
-        if self.map_data[target_y][target_x] == 0:
-            # Avoid stepping on goal for now
-            if (target_x, target_y) != self.goal_pos:
-                self.enemy_tile_x = target_x
-                self.enemy_tile_y = target_y
+        target_x = self.enemy_tile_x + step_x
+        target_y = self.enemy_tile_y + step_y
+
+        # Move if not wall
+        if self.map_data[target_y][target_x] != 1:
+            self.enemy_tile_x = target_x
+            self.enemy_tile_y = target_y
 
 
 def main() -> None:
