@@ -82,16 +82,16 @@ class Game:
                     target_x += 1
 
                 # Check map collision
-                if self.map_data[target_y][target_x] != 1:
+                if (target_x, target_y) == (self.enemy_tile_x, self.enemy_tile_y):
+                    print("You attack!")
+                    self.turn_count += 1
+                    self.move_enemy()
+
+                elif self.map_data[target_y][target_x] != 1:
                     self.player_tile_x = target_x
                     self.player_tile_y = target_y
                     self.turn_count += 1
                     self.move_enemy()
-
-                # Check enemy collision
-                if (self.enemy_tile_x, self.enemy_tile_y) == (self.player_tile_x, self.player_tile_y):
-                    self.game_over = True
-                    print("Game Over!")
 
                 if (self.player_tile_x, self.player_tile_y) == self.goal_pos:
                     self.game_won = True
@@ -229,7 +229,7 @@ class Game:
         target_y = self.enemy_tile_y + step_y
 
         # Move if not wall
-        if self.map_data[target_y][target_x] != 1:
+        if (self.map_data[target_y][target_x] != 1 and (target_x, target_y) != (self.player_tile_x, self.player_tile_y)):
             self.enemy_tile_x = target_x
             self.enemy_tile_y = target_y
 
