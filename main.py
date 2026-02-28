@@ -66,7 +66,7 @@ class Game:
                     self.reset_game()
                     return
                 
-                if self.game_won:
+                if self.game_won or self.game_over:
                     return
                 
                 target_x = self.player_tile_x
@@ -87,6 +87,11 @@ class Game:
                     self.player_tile_y = target_y
                     self.turn_count += 1
                     self.move_enemy()
+
+                # Check enemy collision
+                if (self.enemy_tile_x, self.enemy_tile_y) == (self.player_tile_x, self.player_tile_y):
+                    self.game_over = True
+                    print("Game Over!")
 
                 if (self.player_tile_x, self.player_tile_y) == self.goal_pos:
                     self.game_won = True
@@ -139,6 +144,12 @@ class Game:
 
             rect = win_surface.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT //2))
             self.screen.blit(win_surface, rect)
+        
+        if self.game_over:
+            over_surface = self.font.render("GAME OVER", True, (200, 0, 0))
+
+            rect = over_surface.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2))
+            self.screen.blit(over_surface, rect)
 
         for x in range(0, WINDOW_WIDTH, TILE_SIZE):
             pygame.draw.line(self.screen, (40, 40, 40), (x, 0), (x, WINDOW_HEIGHT))
@@ -189,6 +200,7 @@ class Game:
                 break
 
         self.game_won = False
+        self.game_over = False
 
         # Spawn enemy
         while True:
