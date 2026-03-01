@@ -83,9 +83,16 @@ class Game:
 
                 # Check map collision
                 if (target_x, target_y) == (self.enemy_tile_x, self.enemy_tile_y):
-                    print("You attack!")
+                    self.enemy_hp -= 1
+                    print(f"You attack! Enemy HP: {self.enemy_hp}")
                     self.turn_count += 1
-                    self.move_enemy()
+                    
+                    if self.enemy_hp <= 0:
+                        print("Enemy defeated!")
+                        self.enemy_tile_x = None
+                        self.enemy_tile_y = None
+                    else:
+                        self.move_enemy()
 
                 elif self.map_data[target_y][target_x] != 1:
                     self.player_tile_x = target_x
@@ -125,8 +132,9 @@ class Game:
                 elif tile_value == 2:
                     pygame.draw.rect(self.screen, GOAL_COLOR, rect)
 
-        enemy_rect = pygame.Rect(self.enemy_tile_x * TILE_SIZE, self.enemy_tile_y * TILE_SIZE, TILE_SIZE, TILE_SIZE)
-        pygame.draw.rect(self.screen, ENEMY_COLOR, enemy_rect)
+        if self.enemy_tile_x is not None:
+            enemy_rect = pygame.Rect(self.enemy_tile_x * TILE_SIZE, self.enemy_tile_y * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+            pygame.draw.rect(self.screen, ENEMY_COLOR, enemy_rect)
 
         pygame.draw.rect(self.screen, PLAYER_COLOR, pygame.Rect(self.player_pos.x - PLAYER_SIZE // 2,
                                                                 self.player_pos.y - PLAYER_SIZE // 2,
@@ -136,8 +144,10 @@ class Game:
                         )
         
         turn_surface = self.font.render(f"Turn: {self.turn_count}", True, (255, 255, 255))
-        
         self.screen.blit(turn_surface, (10, 10))
+
+        hp_surface = self.font.render(f"HP: {self.player_hp}", True, (255, 100, 100))
+        self.screen.blit(hp_surface, (10, 30))
 
         if self.game_won:
             win_surface = self.font.render("YOU WIN", True, (255, 215, 0))
@@ -212,6 +222,9 @@ class Game:
                 self.enemy_tile_y = enemy_y
                 break
 
+        self.player_hp = 5
+        self.enemy_hp = 3
+
     def move_enemy(self):
         dx = self.player_tile_x - self.enemy_tile_x
         dy = self.player_tile_y - self.enemy_tile_y
@@ -232,6 +245,15 @@ class Game:
         if (self.map_data[target_y][target_x] != 1 and (target_x, target_y) != (self.player_tile_x, self.player_tile_y)):
             self.enemy_tile_x = target_x
             self.enemy_tile_y = target_y
+
+        # Attack
+        if (abs(self.enemy_tile_x - self.player_tile_x) + abs(self.enemy_tile_y - self.player_tile_y) == 1):
+            self.player_hp -= 1
+            print(f"Enemy hits you! Player HP: {self.player_hp}")
+
+            if self.player_hp <= 0:
+                self.game_over = True
+                print("Game Over!")
 
 
 def main() -> None:
