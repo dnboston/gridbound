@@ -226,6 +226,9 @@ class Game:
         self.enemy_hp = 3
 
     def move_enemy(self):
+        if self.enemy_tile_x is None:
+            return
+
         dx = self.player_tile_x - self.enemy_tile_x
         dy = self.player_tile_y - self.enemy_tile_y
 
