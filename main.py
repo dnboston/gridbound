@@ -81,25 +81,27 @@ class Game:
                 elif event.key == pygame.K_d:
                     target_x += 1
 
-                # Check map collision
-                if (target_x, target_y) == (self.enemy_tile_x, self.enemy_tile_y):
-                    self.enemy_hp -= 1
-                    print(f"You attack! Enemy HP: {self.enemy_hp}")
+                # Movement block
+                enemy = next((e for e in self.enemies if (e["x"], e["y"]) == (target_x, target_y)), None)
+
+                if enemy is not None:
+                    enemy["hp"] -= 1
+                    print(f"You attack! Enemy HP: {enemy['hp']}")
                     self.turn_count += 1
-                    
-                    if self.enemy_hp <= 0:
+
+                    if enemy["hp"] <= 0:
                         print("Enemy defeated!")
-                        self.enemy_tile_x = None
-                        self.enemy_tile_y = None
-                    else:
-                        self.move_enemy()
+                        self.enemies.remove(enemy)
+                    
+                    self.move_enemies()
 
                 elif self.map_data[target_y][target_x] != 1:
                     self.player_tile_x = target_x
                     self.player_tile_y = target_y
                     self.turn_count += 1
-                    self.move_enemy()
+                    self.move_enemies()
 
+                # Win check
                 if (self.player_tile_x, self.player_tile_y) == self.goal_pos:
                     self.game_won = True
                     print("You've reached the goal!")
@@ -132,9 +134,8 @@ class Game:
                 elif tile_value == 2:
                     pygame.draw.rect(self.screen, GOAL_COLOR, rect)
 
-        if self.enemy_tile_x is not None:
-            enemy_rect = pygame.Rect(self.enemy_tile_x * TILE_SIZE, self.enemy_tile_y * TILE_SIZE, TILE_SIZE, TILE_SIZE)
-            pygame.draw.rect(self.screen, ENEMY_COLOR, enemy_rect)
+        for enemy in self.enemies:
+            pygame.draw.rect(self.screen, (200, 50, 50), (enemy["x"] * TILE_SIZE, enemy["y"] * TILE_SIZE, TILE_SIZE, TILE_SIZE))
 
         pygame.draw.rect(self.screen, PLAYER_COLOR, pygame.Rect(self.player_pos.x - PLAYER_SIZE // 2,
                                                                 self.player_pos.y - PLAYER_SIZE // 2,
@@ -218,45 +219,44 @@ class Game:
             enemy_y = random.randint(1, GRID_HEIGHT - 2)
 
             if (self.map_data[enemy_y][enemy_x] == 0 and (enemy_x, enemy_y) != (self.player_tile_x, self.player_tile_y) and (enemy_x, enemy_y) != self.goal_pos):
-                self.enemy_tile_x = enemy_x
-                self.enemy_tile_y = enemy_y
+                self.enemies = [{"x": 8, "y": 8, "hp": 3}, {"x": 2, "y": 7, "hp": 3}, {"x": 10, "y": 3, "hp": 3}]
                 break
 
         self.player_hp = 5
-        self.enemy_hp = 3
 
-    def move_enemy(self):
-        if self.enemy_tile_x is None:
+    def move_enemies(self):
+        if not self.enemies:
             return
 
-        dx = self.player_tile_x - self.enemy_tile_x
-        dy = self.player_tile_y - self.enemy_tile_y
+        for enemy in self.enemies:
+            dx = self.player_tile_x - enemy["x"]
+            dy = self.player_tile_y - enemy["y"]
 
-        step_x = 0
-        step_y = 0
+            step_x = 0
+            step_y = 0
 
-        # Choose dominant direction
-        if abs(dx) > abs(dy):
-            step_x = 1 if dx > 0 else -1
-        else:
-            step_y = 1 if dy > 0 else -1
+            # Choose dominant direction
+            if abs(dx) > abs(dy):
+                step_x = 1 if dx > 0 else -1
+            else:
+                step_y = 1 if dy > 0 else -1
 
-        target_x = self.enemy_tile_x + step_x
-        target_y = self.enemy_tile_y + step_y
+            target_x = enemy["x"]+ step_x
+            target_y = enemy["y"] + step_y
 
-        # Move if not wall
-        if (self.map_data[target_y][target_x] != 1 and (target_x, target_y) != (self.player_tile_x, self.player_tile_y)):
-            self.enemy_tile_x = target_x
-            self.enemy_tile_y = target_y
+            # Move if not wall and prevent enemies from walking into each other
+            if (self.map_data[target_y][target_x] != 1 and (target_x, target_y) != (self.player_tile_x, self.player_tile_y) and not any((e["x"], e["y"]) == (target_x, target_y) for e in self.enemies)):
+                enemy["x"] = target_x
+                enemy["y"] = target_y
 
-        # Attack
-        if (abs(self.enemy_tile_x - self.player_tile_x) + abs(self.enemy_tile_y - self.player_tile_y) == 1):
-            self.player_hp -= 1
-            print(f"Enemy hits you! Player HP: {self.player_hp}")
+            # Attack if adjacent
+            if (abs(enemy["x"] - self.player_tile_x) + abs(enemy["y"] - self.player_tile_y) == 1):
+                self.player_hp -= 1
+                print(f"Enemy hits you! Player HP: {self.player_hp}")
 
-            if self.player_hp <= 0:
-                self.game_over = True
-                print("Game Over!")
+                if self.player_hp <= 0:
+                    self.game_over = True
+                    print("Game Over!")
 
 
 def main() -> None:
