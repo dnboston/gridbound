@@ -85,8 +85,9 @@ class Game:
                 enemy = next((e for e in self.enemies if (e["x"], e["y"]) == (target_x, target_y)), None)
 
                 if enemy is not None:
-                    enemy["hp"] -= 1
-                    print(f"You attack! Enemy HP: {enemy['hp']}")
+                    damage = random.randint(1, 2)
+                    enemy["hp"] -= damage
+                    print(f"You deal {damage}! Enemy HP: {enemy['hp']}")
                     self.turn_count += 1
 
                     if enemy["hp"] <= 0:
@@ -251,8 +252,9 @@ class Game:
 
             # Attack if adjacent
             if (abs(enemy["x"] - self.player_tile_x) + abs(enemy["y"] - self.player_tile_y) == 1):
-                self.player_hp -= 1
-                print(f"Enemy hits you! Player HP: {self.player_hp}")
+                damage = random.randint(1, 2)
+                self.player_hp -= damage
+                print(f"Enemy deals {damage} damage! Player HP: {self.player_hp}")
 
                 if self.player_hp <= 0:
                     self.game_over = True
