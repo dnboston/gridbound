@@ -93,6 +93,12 @@ class Game:
                     if enemy["hp"] <= 0:
                         print("Enemy defeated!")
                         self.enemies.remove(enemy)
+
+                        self.player_xp += 1
+                        print(f"XP Gained! ({self.player_xp}/{self.xp_to_next_level})")
+
+                        if self.player_xp >= self.xp_to_next_level:
+                            self.level_up()
                     
                     self.move_enemies()
 
@@ -150,6 +156,12 @@ class Game:
 
         hp_surface = self.font.render(f"HP: {self.player_hp}", True, (255, 100, 100))
         self.screen.blit(hp_surface, (10, 30))
+
+        level_surface = self.font.render(f"Level: {self.player_level}", True, (200, 200, 255))
+        self.screen.blit(level_surface, (10, 50))
+
+        xp_surface = self.font.render(f"XP: {self.player_xp}/{self.xp_to_next_level}", True, (200, 255, 200))
+        self.screen.blit(xp_surface, (10, 70))
 
         if self.game_won:
             win_surface = self.font.render("YOU WIN", True, (255, 215, 0))
@@ -223,7 +235,11 @@ class Game:
                 self.enemies = [{"x": 8, "y": 8, "hp": 3}, {"x": 2, "y": 7, "hp": 3}, {"x": 10, "y": 3, "hp": 3}]
                 break
 
-        self.player_hp = 5
+        self.player_xp = 0
+        self.player_level = 1
+        self.xp_to_next_level = 3
+        self.player_max_hp = 15
+        self.player_hp = self.player_max_hp
 
     def move_enemies(self):
         if not self.enemies:
@@ -259,6 +275,15 @@ class Game:
                 if self.player_hp <= 0:
                     self.game_over = True
                     print("Game Over!")
+
+    def level_up(self):
+        self.player_level += 1
+        self.player_xp = 0
+
+        self.player_max_hp += 2
+        self.player_hp = min(self.player_hp + 2, self.player_max_hp)
+
+        print(F"Level Up! You are now level {self.player_level}")
 
 
 def main() -> None:
