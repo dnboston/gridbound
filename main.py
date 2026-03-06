@@ -22,8 +22,6 @@ WALL_COLOR = (100, 100, 100)
 
 GOAL_COLOR = (0, 150, 0)
 
-ENEMY_COLOR = (200, 50, 50)
-
 
 def snap_to_grid(value: float, tile_size: int) -> float:
     return round((value - tile_size / 2) / tile_size) * tile_size + tile_size / 2
@@ -142,7 +140,8 @@ class Game:
                     pygame.draw.rect(self.screen, GOAL_COLOR, rect)
 
         for enemy in self.enemies:
-            pygame.draw.rect(self.screen, (200, 50, 50), (enemy["x"] * TILE_SIZE, enemy["y"] * TILE_SIZE, TILE_SIZE, TILE_SIZE))
+            enemy_color = (50, 200, 50) if enemy["type"] == "goblin" else (200, 50, 50)
+            pygame.draw.rect(self.screen, enemy_color, (enemy["x"] * TILE_SIZE, enemy["y"] * TILE_SIZE, TILE_SIZE, TILE_SIZE))
 
         pygame.draw.rect(self.screen, PLAYER_COLOR, pygame.Rect(self.player_pos.x - PLAYER_SIZE // 2,
                                                                 self.player_pos.y - PLAYER_SIZE // 2,
@@ -232,7 +231,7 @@ class Game:
             enemy_y = random.randint(1, GRID_HEIGHT - 2)
 
             if (self.map_data[enemy_y][enemy_x] == 0 and (enemy_x, enemy_y) != (self.player_tile_x, self.player_tile_y) and (enemy_x, enemy_y) != self.goal_pos):
-                self.enemies = [{"x": 8, "y": 8, "hp": 3}, {"x": 2, "y": 7, "hp": 3}, {"x": 10, "y": 3, "hp": 3}]
+                self.enemies = [{"x": 8, "y": 8, "hp": 2, "type": "goblin"}, {"x": 2, "y": 7, "hp": 4, "type": "orc"}, {"x": 10, "y": 3, "hp": 2, "type": "goblin"}]
                 break
 
         self.player_xp = 0
@@ -268,9 +267,13 @@ class Game:
 
             # Attack if adjacent
             if (abs(enemy["x"] - self.player_tile_x) + abs(enemy["y"] - self.player_tile_y) == 1):
-                damage = random.randint(1, 2)
+                if enemy["type"] == "goblin":
+                    damage = random.randint(1, 2)
+                else: #orc
+                    damage = random.randint(1, 3)
+
                 self.player_hp -= damage
-                print(f"Enemy deals {damage} damage! Player HP: {self.player_hp}")
+                print(f"{enemy["type"].capitalize()} hits you for {damage}! Player HP: {self.player_hp}")
 
                 if self.player_hp <= 0:
                     self.game_over = True
