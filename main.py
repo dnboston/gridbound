@@ -104,6 +104,16 @@ class Game:
                     self.player_tile_x = target_x
                     self.player_tile_y = target_y
                     self.turn_count += 1
+
+                    # Healing check immediately after moving
+                    if (self.player_tile_x, self.player_tile_y) in self.healing_tiles:
+                        self.healing_tiles.remove((self.player_tile_x, self.player_tile_y))
+
+                        heal_amount = 2
+                        self.player_hp = min(self.player_hp + heal_amount, self.player_max_hp)
+
+                        print(f"You found a healing tile! +{heal_amount} HP")
+
                     self.move_enemies()
 
                 # Win check
@@ -142,6 +152,9 @@ class Game:
         for enemy in self.enemies:
             enemy_color = (50, 200, 50) if enemy["type"] == "goblin" else (200, 50, 50)
             pygame.draw.rect(self.screen, enemy_color, (enemy["x"] * TILE_SIZE, enemy["y"] * TILE_SIZE, TILE_SIZE, TILE_SIZE))
+
+        for tile in self.healing_tiles:
+            pygame.draw.rect(self.screen, (50, 150, 255), (tile[0] * TILE_SIZE, tile[1] * TILE_SIZE, TILE_SIZE, TILE_SIZE))
 
         pygame.draw.rect(self.screen, PLAYER_COLOR, pygame.Rect(self.player_pos.x - PLAYER_SIZE // 2,
                                                                 self.player_pos.y - PLAYER_SIZE // 2,
@@ -239,6 +252,15 @@ class Game:
         self.xp_to_next_level = 3
         self.player_max_hp = 15
         self.player_hp = self.player_max_hp
+
+        self.healing_tiles = []
+
+        for _ in range(3):
+            x = random.randint(1, len(self.map_data[0]) - 2)
+            y = random.randint(1, len(self.map_data) - 2)
+
+            if self.map_data[y][x] == 0 and (x, y) != (self.player_tile_x, self.player_tile_y):
+                self.healing_tiles.append((x, y))
 
     def move_enemies(self):
         if not self.enemies:
