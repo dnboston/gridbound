@@ -200,28 +200,12 @@ class Game:
         self.player_tile_x = int(self.player_pos.x // TILE_SIZE)
         self.player_tile_y = int(self.player_pos.y // TILE_SIZE)
 
-        # Create empty map
-        self.map_data = [[0 for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
+        self.generate_map()
 
-        # Create border walls
-        for x in range(GRID_WIDTH):
-            self.map_data[0][x] = 1
-            self.map_data[GRID_HEIGHT - 1][x] = 1
-
-        for y in range(GRID_HEIGHT):
-            self.map_data[y][0] = 1
-            self.map_data[y][GRID_WIDTH - 1] = 1
-
-        # Add random interior walls
-        wall_count = 20
-
-        for _ in range(wall_count):
-            x = random.randint(1, GRID_WIDTH - 2)
-            y = random.randint(1, GRID_HEIGHT - 2)
-
-            # Avoid placing wall on player start
-            if (x, y) != (self.player_tile_x, self.player_tile_y):
-                self.map_data[y][x] = 1
+        # Ensure player spawns on floor
+        while self.map_data[self.player_tile_y][self.player_tile_x] == 1:
+            self.player_tile_x = random.randint(1, GRID_WIDTH - 2)
+            self.player_tile_y = random.randint(1, GRID_HEIGHT - 2)
 
         self.turn_count = 0
 
@@ -309,6 +293,26 @@ class Game:
         self.player_hp = min(self.player_hp + 2, self.player_max_hp)
 
         print(F"Level Up! You are now level {self.player_level}")
+
+    def generate_map(self):
+        self.map_data = []
+
+        for y in range(GRID_HEIGHT):
+            row = []
+            for x in range(GRID_WIDTH):
+
+                # Border walls
+                if x == 0 or y == 0 or x == GRID_WIDTH - 1 or y == GRID_HEIGHT - 1:
+                    row.append(1)
+                else:
+                    # Random walls (20% chance)
+                    if random.random() < 0.2:
+                        row.append(1)
+                    else:
+                        row.append(0)
+
+            self.map_data.append(row)
+
 
 
 def main() -> None:
