@@ -223,13 +223,28 @@ class Game:
         self.game_over = False
 
         # Spawn enemy
-        while True:
-            enemy_x = random.randint(1, GRID_WIDTH - 2)
-            enemy_y = random.randint(1, GRID_HEIGHT - 2)
+        self.enemies = []
 
-            if (self.map_data[enemy_y][enemy_x] == 0 and (enemy_x, enemy_y) != (self.player_tile_x, self.player_tile_y) and (enemy_x, enemy_y) != self.goal_pos):
-                self.enemies = [{"x": 8, "y": 8, "hp": 2, "type": "goblin"}, {"x": 2, "y": 7, "hp": 4, "type": "orc"}, {"x": 10, "y": 3, "hp": 2, "type": "goblin"}]
-                break
+        enemy_types = ["goblin", "orc", "goblin"]
+
+        for enemy_type in enemy_types:
+            while True:
+                x = random.randint(1, GRID_WIDTH - 2)
+                y = random.randint(1, GRID_HEIGHT - 2)
+
+                if (self.map_data[y][x] == 0 and (x, y) != (self.player_tile_x, self.player_tile_y) and (x, y) != self.goal_pos) and not any ((e["x"], e["y"]) == (x, y) for e in self.enemies):
+                    hp = 2 if enemy_type == "goblin" else 4
+
+                    self.enemies.append({"x": x, "y": y, "hp": hp, "type": enemy_type})
+                    break
+
+        # while True:
+        #     enemy_x = random.randint(1, GRID_WIDTH - 2)
+        #     enemy_y = random.randint(1, GRID_HEIGHT - 2)
+
+        #     if (self.map_data[enemy_y][enemy_x] == 0 and (enemy_x, enemy_y) != (self.player_tile_x, self.player_tile_y) and (enemy_x, enemy_y) != self.goal_pos):
+        #         self.enemies = [{"x": 8, "y": 8, "hp": 2, "type": "goblin"}, {"x": 2, "y": 7, "hp": 4, "type": "orc"}, {"x": 10, "y": 3, "hp": 2, "type": "goblin"}]
+        #         break
 
         self.player_xp = 0
         self.player_level = 1
