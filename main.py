@@ -238,14 +238,6 @@ class Game:
                     self.enemies.append({"x": x, "y": y, "hp": hp, "type": enemy_type})
                     break
 
-        # while True:
-        #     enemy_x = random.randint(1, GRID_WIDTH - 2)
-        #     enemy_y = random.randint(1, GRID_HEIGHT - 2)
-
-        #     if (self.map_data[enemy_y][enemy_x] == 0 and (enemy_x, enemy_y) != (self.player_tile_x, self.player_tile_y) and (enemy_x, enemy_y) != self.goal_pos):
-        #         self.enemies = [{"x": 8, "y": 8, "hp": 2, "type": "goblin"}, {"x": 2, "y": 7, "hp": 4, "type": "orc"}, {"x": 10, "y": 3, "hp": 2, "type": "goblin"}]
-        #         break
-
         self.player_xp = 0
         self.player_level = 1
         self.xp_to_next_level = 3
@@ -310,24 +302,46 @@ class Game:
         print(F"Level Up! You are now level {self.player_level}")
 
     def generate_map(self):
-        self.map_data = []
+        # Start with all walls
+        self.map_data = [[1 for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
 
-        for y in range(GRID_HEIGHT):
-            row = []
-            for x in range(GRID_WIDTH):
+        rooms = []
 
-                # Border walls
-                if x == 0 or y == 0 or x == GRID_WIDTH - 1 or y == GRID_HEIGHT - 1:
-                    row.append(1)
-                else:
-                    # Random walls (20% chance)
-                    if random.random() < 0.2:
-                        row.append(1)
-                    else:
-                        row.append(0)
+        ROOM_COUNT = 5
+        ROOM_MIN_SIZE = 3
+        ROOM_MAX_SIZE = 6
 
-            self.map_data.append(row)
+        for _ in range(ROOM_COUNT):
+            w = random.randint(ROOM_MIN_SIZE, ROOM_MAX_SIZE)
+            h = random.randint(ROOM_MIN_SIZE, ROOM_MAX_SIZE)
 
+            x = random.randint(1, GRID_WIDTH - w - 2)
+            y = random.randint(1, GRID_HEIGHT - h - 2)
+
+            new_room = (x, y, w, h)
+
+            # Carve room
+            for ry in range(y, y + h):
+                for rx in range(x, x + w):
+                    self.map_data[ry][rx] = 0
+
+            rooms.append(new_room)
+
+        # Connect rooms
+        for i in range(1, len(rooms)):
+            prev = rooms[i - 1]
+            curr = rooms[i]
+
+            prev_center = (prev[0] + prev[2] // 2, prev[1] + prev[3] // 2)
+            curr_center = (curr[0] + curr[2] // 2, curr[1] + curr[3] // 2)
+
+            # Horizontal corridor
+            for x in range(min(prev_center[0], curr_center[0]), max(prev_center[0], curr_center[0]) + 1):
+                self.map_data[prev_center[1]][x] = 0
+
+            # Vertical corridor
+            for y in range(min(prev_center[1], curr_center[1]), max(prev_center[1], curr_center[1]) + 1):
+                self.map_data[y][curr_center[0]] = 0
 
 
 def main() -> None:
