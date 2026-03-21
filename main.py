@@ -320,6 +320,10 @@ class Game:
 
             new_room = (x, y, w, h)
 
+            # Check overlap
+            if any(self.rooms_overlap(new_room, other) for other in rooms):
+                continue
+
             # Carve room
             for ry in range(y, y + h):
                 for rx in range(x, x + w):
@@ -343,6 +347,11 @@ class Game:
             for y in range(min(prev_center[1], curr_center[1]), max(prev_center[1], curr_center[1]) + 1):
                 self.map_data[y][curr_center[0]] = 0
 
+    def rooms_overlap(self, r1, r2):
+        x1, y1, w1, h1 = r1
+        x2, y2, w2, h2 = r2
+
+        return not (x1 + w1 < x2 or x1 > x2 + w2 or y1 + h1 < y2 or y1 > y2 + h2)
 
 def main() -> None:
     game = Game()
