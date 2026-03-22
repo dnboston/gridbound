@@ -311,7 +311,12 @@ class Game:
         ROOM_MIN_SIZE = 3
         ROOM_MAX_SIZE = 6
 
-        for _ in range(ROOM_COUNT):
+        attempts = 0
+        max_attempts = ROOM_COUNT * 5
+
+        while len(rooms) < ROOM_COUNT and attempts < max_attempts:
+            attempts += 1
+            
             w = random.randint(ROOM_MIN_SIZE, ROOM_MAX_SIZE)
             h = random.randint(ROOM_MIN_SIZE, ROOM_MAX_SIZE)
 
