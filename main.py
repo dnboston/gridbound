@@ -197,10 +197,10 @@ class Game:
 
     def reset_game(self):
         # Reset player position (center of grid)
-        self.player_tile_x = int(self.player_pos.x // TILE_SIZE)
-        self.player_tile_y = int(self.player_pos.y // TILE_SIZE)
-
         self.generate_map()
+        
+        first_room = self.rooms[0]
+        self.player_tile_x, self.player_tile_y = self.get_room_center(first_room)
 
         # Ensure player spawns on floor
         while self.map_data[self.player_tile_y][self.player_tile_x] == 1:
@@ -210,14 +210,11 @@ class Game:
         self.turn_count = 0
 
         # Place goal tile
-        while True:
-            goal_x = random.randint(1, GRID_WIDTH - 2)
-            goal_y = random.randint(1, GRID_HEIGHT - 2)
+        last_room = self.rooms[-1]
+        goal_x, goal_y = self.get_room_center(last_room)
 
-            if self.map_data[goal_y][goal_x] == 0 and (goal_x, goal_y) != (self.player_tile_x, self.player_tile_y):
-                self.map_data[goal_y][goal_x] = 2
-                self.goal_pos = (goal_x, goal_y)
-                break
+        self.map_data[goal_y][goal_x] = 2
+        self.goal_pos = (goal_x, goal_y)
 
         self.game_won = False
         self.game_over = False
@@ -352,11 +349,17 @@ class Game:
             for y in range(min(prev_center[1], curr_center[1]), max(prev_center[1], curr_center[1]) + 1):
                 self.map_data[y][curr_center[0]] = 0
 
+        self.rooms = rooms
+
     def rooms_overlap(self, r1, r2):
         x1, y1, w1, h1 = r1
         x2, y2, w2, h2 = r2
 
         return not (x1 + w1 < x2 or x1 > x2 + w2 or y1 + h1 < y2 or y1 > y2 + h2)
+
+    def get_room_center(self, room):
+        x, y, w, h = room
+        return (x + w // 2, y + h // 2)
 
 def main() -> None:
     game = Game()
